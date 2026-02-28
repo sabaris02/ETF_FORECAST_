@@ -1,9 +1,9 @@
 # 📈 India ETF ML Dashboard
 
 A production-grade machine learning dashboard for predicting **Indian Gold and Silver ETF** daily returns using regression and classification models.
-
+access the website on online at https://etfforecast-ldv6ihy9sqsp3ugjaphvid.streamlit.app/
 ---
-
+for local deployment and development installation
 ## 🚀 Quick Start
 
 ```bash
