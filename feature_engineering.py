@@ -173,6 +173,10 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
     }
     feature_cols = [c for c in df.columns if c not in exclude]
 
+    # ── Guard against ±inf from division-by-zero (e.g. vol_ratio, pct_change)
+    # Replace inf with NaN so the dropna below removes them cleanly.
+    df[feature_cols] = df[feature_cols].replace([np.inf, -np.inf], np.nan)
+
     # Drop rows with any NaN in features or targets
     required_cols = feature_cols + ["regression_target", "classification_target"]
     df.dropna(subset=required_cols, inplace=True)

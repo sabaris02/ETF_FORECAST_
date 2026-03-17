@@ -100,28 +100,31 @@ def run_backtest(
     -------
     dict with equity curves, metrics, and signal series
     """
-    actual_ret = df["return_1d"].copy()
+    # ── Align returns with prediction horizon ─────────────────────────────
+    # The model predicts the NEXT-day return (target = return_1d.shift(-1)).
+    # So when the model says "up" on day t, the P&L should come from day t+1.
+    # We shift return_1d by -1 to get next-day returns aligned to the
+    # prediction date, then drop the last row (NaN from the shift).
+    next_day_ret = df["return_1d"].shift(-1).copy()
+    next_day_ret.dropna(inplace=True)
+
+    # Trim predictions to match the available next-day returns
+    preds = predictions[: len(next_day_ret)]
 
     if oof_indices is not None:
-        # Use only rows where we have OOF predictions
-        valid_mask = ~np.isnan(predictions)
+        valid_mask = ~np.isnan(preds)
         valid_positions = np.where(valid_mask)[0]
         if len(valid_positions) == 0:
             raise ValueError("No valid OOF predictions found.")
-        actual_ret = actual_ret.iloc[valid_positions]
-        preds = predictions[valid_mask]
+        next_day_ret = next_day_ret.iloc[valid_positions]
+        preds = preds[valid_mask]
     else:
-        preds = predictions
-        # Drop NaN predictions
         valid_mask = ~np.isnan(preds)
-        actual_ret = actual_ret[valid_mask]
+        next_day_ret = next_day_ret[valid_mask]
         preds = preds[valid_mask]
 
-    # But we use next-day actual return for evaluation
-    # actual_ret here corresponds to the day AFTER the prediction date
-    # Since targets are shifted, actual_ret already lines up correctly
-    strategy_ret = build_strategy_returns(actual_ret, preds, task)
-    bah_ret = actual_ret.rename("bah_return")
+    strategy_ret = build_strategy_returns(next_day_ret, preds, task)
+    bah_ret = next_day_ret.rename("bah_return")
 
     strat_cum = cumulative_returns(strategy_ret).rename("Strategy")
     bah_cum = cumulative_returns(bah_ret).rename("Buy & Hold")
@@ -162,5 +165,5 @@ def run_backtest(
         "strategy_cum": strat_cum,
         "bah_cum": bah_cum,
         "metrics": metrics,
-        "signal": pd.Series(signal, index=actual_ret.index),
+        "signal": pd.Series(signal, index=next_day_ret.index),
     }

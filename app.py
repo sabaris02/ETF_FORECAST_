@@ -53,29 +53,87 @@ st.markdown(
 
     html, body, [class*="css"] {
         font-family: 'JetBrains Mono', 'Courier New', monospace !important;
+        color: #E8EAF0 !important;
     }
-    .main { background: #0A0C10; }
+
+    /* ── Main backgrounds ── */
+    .main, .block-container { background: #0A0C10 !important; }
     .block-container { padding: 1.5rem 2rem; max-width: 1400px; }
 
-    /* Sidebar */
+    /* ── Sidebar ── */
     [data-testid="stSidebar"] {
         background: #0D1117 !important;
         border-right: 1px solid rgba(255,255,255,0.06) !important;
     }
+    [data-testid="stSidebar"] * { color: #E8EAF0 !important; }
 
-    /* Section header */
+    /* ── Headings & text ── */
+    h1, h2, h3, h4, h5, h6, p, span, div, label { color: #E8EAF0 !important; }
+
+    /* ── Tabs ── */
+    [data-testid="stTabs"] button { color: #8892A4 !important; }
+    [data-testid="stTabs"] button[aria-selected="true"] {
+        color: #4A90D9 !important;
+        border-bottom-color: #4A90D9 !important;
+    }
+
+    /* ── Expander ── */
+    [data-testid="stExpander"] {
+        background: #0D1117 !important;
+        border: 1px solid rgba(255,255,255,0.06) !important;
+        border-radius: 8px !important;
+    }
+    [data-testid="stExpander"] summary, [data-testid="stExpander"] p {
+        color: #E8EAF0 !important;
+    }
+
+    /* ── Dataframe ── */
+    [data-testid="stDataFrame"] { background: #0D1117 !important; }
+    [data-testid="stDataFrame"] th {
+        background: #161B22 !important;
+        color: #4A90D9 !important;
+        font-weight: 600 !important;
+    }
+    [data-testid="stDataFrame"] td { color: #C8CDD8 !important; }
+
+    /* ── Captions ── */
+    [data-testid="stCaptionContainer"], small, .caption {
+        color: #8892A4 !important;
+    }
+
+    /* ── Selectbox / radio ── */
+    [data-testid="stSelectbox"] div,
+    [data-testid="stRadio"] label,
+    [data-testid="stSlider"] label {
+        color: #E8EAF0 !important;
+    }
+
+    /* ── Download button ── */
+    [data-testid="stDownloadButton"] button {
+        background: rgba(74,144,217,0.15) !important;
+        color: #4A90D9 !important;
+        border: 1px solid rgba(74,144,217,0.35) !important;
+    }
+    [data-testid="stDownloadButton"] button:hover {
+        background: rgba(74,144,217,0.25) !important;
+    }
+
+    /* ── Success / error / info boxes ── */
+    [data-testid="stAlert"] { color: #E8EAF0 !important; }
+
+    /* ── Section header ── */
     .section-header {
         font-family: 'JetBrains Mono', monospace;
         font-size: 0.7em;
         letter-spacing: 3px;
         text-transform: uppercase;
-        color: #4A90D9;
+        color: #4A90D9 !important;
         border-bottom: 1px solid rgba(74,144,217,0.3);
         padding-bottom: 6px;
         margin: 20px 0 14px 0;
     }
 
-    /* Status badge */
+    /* ── Status badge ── */
     .badge {
         display: inline-block;
         padding: 3px 10px;
@@ -84,12 +142,12 @@ st.markdown(
         font-weight: 600;
         letter-spacing: 1px;
     }
-    .badge-gold { background: rgba(245,166,35,0.15); color: #F5A623; border: 1px solid rgba(245,166,35,0.3); }
+    .badge-gold   { background: rgba(245,166,35,0.15);  color: #F5A623; border: 1px solid rgba(245,166,35,0.3); }
     .badge-silver { background: rgba(168,169,173,0.15); color: #C0C0C0; border: 1px solid rgba(168,169,173,0.3); }
-    .badge-reg { background: rgba(0,196,140,0.12); color: #00C48C; border: 1px solid rgba(0,196,140,0.25); }
-    .badge-cls { background: rgba(30,144,255,0.12); color: #1E90FF; border: 1px solid rgba(30,144,255,0.25); }
+    .badge-reg    { background: rgba(0,196,140,0.12);   color: #00C48C; border: 1px solid rgba(0,196,140,0.25); }
+    .badge-cls    { background: rgba(30,144,255,0.12);  color: #1E90FF; border: 1px solid rgba(30,144,255,0.25); }
 
-    /* Hide Streamlit branding */
+    /* ── Hide Streamlit branding ── */
     #MainMenu, footer { visibility: hidden; }
     </style>
     """,
@@ -236,7 +294,51 @@ with info_cols[3]:
     metric_card("Data Points", f"{len(df):,}", f"{feature_cols.__len__()} features")
 
 price_fig = plot_price_chart(df, etf_label, show_indicators=show_indicators)
-st.plotly_chart(price_fig, width='stretch', config={"displayModeBar": False})
+st.plotly_chart(price_fig, use_container_width=True, config={"displayModeBar": False})
+
+# ── Newbie-friendly indicator guide ──────────────────────────────────────────
+if show_indicators:
+    with st.expander("📖 How to Read These Indicators", expanded=False):
+        st.markdown(
+            """
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 0;">
+
+<div style="background:rgba(255,140,66,0.08);border:1px solid rgba(255,140,66,0.25);border-radius:8px;padding:12px 16px;">
+<div style="color:#FF8C42;font-weight:700;font-size:0.85em;letter-spacing:1px;margin-bottom:6px;">📈 EMA (Exponential Moving Average)</div>
+<div style="color:#C0C8D8;font-size:0.82em;line-height:1.6;">
+Smooths out price noise to show the trend direction.<br>
+<span style="color:#FF8C42;">■</span> <b>EMA 20</b> = short-term trend (last ~1 month).<br>
+<span style="color:#7B68EE;">■</span> <b>EMA 50</b> = medium-term trend (last ~2.5 months).<br>
+<b>Tip:</b> When EMA 20 crosses above EMA 50 → bullish signal 🟢</div></div>
+
+<div style="background:rgba(79,195,247,0.08);border:1px solid rgba(79,195,247,0.25);border-radius:8px;padding:12px 16px;">
+<div style="color:#4FC3F7;font-weight:700;font-size:0.85em;letter-spacing:1px;margin-bottom:6px;">📉 Bollinger Bands</div>
+<div style="color:#C0C8D8;font-size:0.82em;line-height:1.6;">
+Shaded channel around price (±2 standard deviations from a 20-day average).<br>
+<b>Tip:</b> Price touching the <b>upper band</b> = potentially overbought 🔴<br>
+Price touching the <b>lower band</b> = potentially oversold 🟢<br>
+Wide bands = high volatility · Narrow bands = low volatility (squeeze)</div></div>
+
+<div style="background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.25);border-radius:8px;padding:12px 16px;">
+<div style="color:#00C48C;font-weight:700;font-size:0.85em;letter-spacing:1px;margin-bottom:6px;">💡 RSI (Relative Strength Index)</div>
+<div style="color:#C0C8D8;font-size:0.82em;line-height:1.6;">
+Measures buying/selling momentum on a 0–100 scale.<br>
+<span style="color:#FF4C61;">■ Above 70</span> (red zone) = <b>Overbought</b> — price may pull back.<br>
+<span style="color:#00C48C;">■ Below 30</span> (green zone) = <b>Oversold</b> — price may rebound.<br>
+<b>Tip:</b> Best used to confirm signals, not in isolation.</div></div>
+
+<div style="background:rgba(30,144,255,0.08);border:1px solid rgba(30,144,255,0.25);border-radius:8px;padding:12px 16px;">
+<div style="color:#1E90FF;font-weight:700;font-size:0.85em;letter-spacing:1px;margin-bottom:6px;">⚡ MACD (Moving Avg Convergence/Divergence)</div>
+<div style="color:#C0C8D8;font-size:0.82em;line-height:1.6;">
+Shows the relationship between two EMAs (12-day & 26-day).<br>
+<span style="color:#1E90FF;">■ Blue line</span> = MACD · <span style="color:#FF8C42;">■ Orange dashed</span> = Signal line<br>
+<span style="color:#00C48C;">■ Green bar</span> = bullish momentum · <span style="color:#FF4C61;">■ Red bar</span> = bearish momentum<br>
+<b>Tip:</b> MACD crossing above the Signal line → bullish entry signal 🟢</div></div>
+
+</div>
+            """,
+            unsafe_allow_html=True,
+        )
 
 
 # ─── Training ─────────────────────────────────────────────────────────────────
@@ -300,144 +402,238 @@ if train_btn:
         st.code(traceback.format_exc())
 
 
-# ─── Section 2: Model Metrics ─────────────────────────────────────────────────
+# ─── Results Section (Tabbed Layout) ──────────────────────────────────────────
 if st.session_state.trained:
     result = st.session_state.result
     agg_metrics = aggregate_fold_metrics(result["fold_metrics"])
 
-    st.markdown('<div class="section-header">Model Performance — Cross-Validation</div>', unsafe_allow_html=True)
-    st.caption(f"Metrics averaged over {n_splits} TimeSeriesSplit folds (mean ± std)")
+    # ── 🔮 Next-Day Forecast ──────────────────────────────────────────────────
+    st.markdown('<div class="section-header">🔮 Next Day Forecast</div>', unsafe_allow_html=True)
 
-    if task == "regression":
-        cols = st.columns(4)
-        metric_items = [
-            ("RMSE", format_num(agg_metrics["RMSE"]["mean"], 6), f"±{agg_metrics['RMSE']['std']:.6f}"),
-            ("MAE", format_num(agg_metrics["MAE"]["mean"], 6), f"±{agg_metrics['MAE']['std']:.6f}"),
-            ("R²", format_num(agg_metrics["R²"]["mean"], 4), f"±{agg_metrics['R²']['std']:.4f}"),
-            ("Dir. Accuracy", format_pct(agg_metrics["Directional Accuracy"]["mean"]),
-             f"±{agg_metrics['Directional Accuracy']['std']*100:.2f}%"),
-        ]
-        for col, (label, val, delta) in zip(cols, metric_items):
-            with col:
-                metric_card(label, val, delta)
+    try:
+        # Use last row of features (today's data) to predict tomorrow
+        X_all = df[feature_cols].values
+        X_last = X_all[-1:].copy()
 
-    else:
-        # Classification metrics — row 1
-        row1 = st.columns(5)
-        cls_metrics = ["Accuracy", "Precision", "Recall", "F1", "ROC-AUC"]
-        for col, metric_name in zip(row1, cls_metrics):
-            with col:
-                val = agg_metrics[metric_name]["mean"]
-                std = agg_metrics[metric_name]["std"]
-                metric_card(metric_name, format_pct(val), f"±{std*100:.2f}%")
+        pipeline = result["pipeline"]
+        latest_close = df["Close"].iloc[-1]
+        latest_date = df.index[-1]
 
-        # Confusion matrix from last fold
-        last_cm = result["fold_metrics"][-1].get("Confusion Matrix")
-        if last_cm is not None:
-            cm_col, _ = st.columns([1, 2])
-            with cm_col:
+        # Work out the next trading date (skip weekends)
+        next_date = latest_date + pd.tseries.offsets.BDay(1)
+
+        if task == "regression":
+            pred_return = float(pipeline.predict(X_last)[0])
+            pred_price = latest_close * (1 + pred_return)
+            direction = "📈 UP" if pred_return > 0 else "📉 DOWN"
+            dir_color = COLORS["success"] if pred_return > 0 else COLORS["danger"]
+            change_pct = pred_return * 100
+        else:
+            pred_class = int(pipeline.predict(X_last)[0])
+            # Estimate rough price using recent avg daily return magnitude
+            recent_avg_move = df["return_1d"].tail(20).abs().mean()
+            pred_return = recent_avg_move if pred_class == 1 else -recent_avg_move
+            pred_price = latest_close * (1 + pred_return)
+            direction = "📈 UP" if pred_class == 1 else "📉 DOWN"
+            dir_color = COLORS["success"] if pred_class == 1 else COLORS["danger"]
+            change_pct = pred_return * 100
+
+        fc_cols = st.columns([1, 1, 1, 1.4])
+        with fc_cols[0]:
+            metric_card("Today's Close", f"₹{latest_close:.2f}", latest_date.strftime("%d %b %Y"))
+        with fc_cols[1]:
+            metric_card("Predicted Price", f"₹{pred_price:.2f}", next_date.strftime("%d %b %Y"))
+        with fc_cols[2]:
+            metric_card("Expected Move", f"{change_pct:+.2f}%", direction, color=dir_color)
+        with fc_cols[3]:
+            signal_label = "BULLISH SIGNAL" if pred_return > 0 else "BEARISH SIGNAL"
+            model_type = "Regression" if task == "regression" else "Classification"
+            st.markdown(
+                f"""
+                <div style="
+                    background: {'rgba(0,196,140,0.1)' if pred_return > 0 else 'rgba(255,76,97,0.1)'};
+                    border: 1px solid {'rgba(0,196,140,0.4)' if pred_return > 0 else 'rgba(255,76,97,0.4)'};
+                    border-radius:10px; padding:18px 20px; height:100%;
+                ">
+                    <div style="color:{dir_color};font-size:2em;font-weight:900;letter-spacing:-1px;">{direction}</div>
+                    <div style="color:{dir_color};font-size:0.72em;letter-spacing:2px;font-weight:600;margin-top:4px;">{signal_label}</div>
+                    <div style="color:#8892A4;font-size:0.7em;margin-top:8px;">
+                        Model: {result['model_name']}<br>
+                        Task: {model_type}<br>
+                        <span style="color:#F5A623;">⚠ Not financial advice</span>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        st.caption(
+            f"📅 Forecast for {next_date.strftime('%A, %d %b %Y')}  ·  "
+            f"Based on features as of {latest_date.strftime('%d %b %Y')}  ·  "
+            f"Model trained on {len(df):,} days"
+        )
+    except Exception as e:
+        st.warning(f"Could not generate next-day forecast: {e}")
+
+    st.divider()
+    st.markdown('<div class="section-header">Model Results</div>', unsafe_allow_html=True)
+
+    tab_perf, tab_feat, tab_bt, tab_export = st.tabs([
+        "📊 Performance", "🧠 Feature Analysis", "📈 Backtest", "⬇️ Export"
+    ])
+
+    # ── Tab 1: Performance ────────────────────────────────────────────────
+    with tab_perf:
+        st.caption(f"Metrics averaged over {n_splits} TimeSeriesSplit folds (mean ± std)")
+
+        if task == "regression":
+            cols = st.columns(4)
+            metric_items = [
+                ("RMSE", format_num(agg_metrics["RMSE"]["mean"], 6), f"±{agg_metrics['RMSE']['std']:.6f}"),
+                ("MAE", format_num(agg_metrics["MAE"]["mean"], 6), f"±{agg_metrics['MAE']['std']:.6f}"),
+                ("R²", format_num(agg_metrics["R²"]["mean"], 4), f"±{agg_metrics['R²']['std']:.4f}"),
+                ("Dir. Accuracy", format_pct(agg_metrics["Directional Accuracy"]["mean"]),
+                 f"±{agg_metrics['Directional Accuracy']['std']*100:.2f}%"),
+            ]
+            for col, (label, val, delta) in zip(cols, metric_items):
+                with col:
+                    metric_card(label, val, delta)
+        else:
+            row1 = st.columns(5)
+            cls_metrics = ["Accuracy", "Precision", "Recall", "F1", "ROC-AUC"]
+            for col, metric_name in zip(row1, cls_metrics):
+                with col:
+                    val = agg_metrics[metric_name]["mean"]
+                    std = agg_metrics[metric_name]["std"]
+                    metric_card(metric_name, format_pct(val), f"±{std*100:.2f}%")
+
+            last_cm = result["fold_metrics"][-1].get("Confusion Matrix")
+            if last_cm is not None:
+                cm_col, _ = st.columns([1, 2])
+                with cm_col:
+                    st.plotly_chart(
+                        plot_confusion_matrix(last_cm),
+                        use_container_width=True,
+                        config={"displayModeBar": False},
+                    )
+
+        # ── Prediction Preview ────────────────────────────────────────────
+        st.markdown(
+            '<div style="color:#4A90D9;font-size:0.72em;letter-spacing:2px;'
+            'text-transform:uppercase;margin:18px 0 8px;">Prediction Preview (Last 10)</div>',
+            unsafe_allow_html=True,
+        )
+        oof = result["oof_preds"]
+        valid_mask = ~np.isnan(oof)
+        target_col = f"{task}_target"
+        preview_df = pd.DataFrame({
+            "Date": df.index[valid_mask],
+            "Close": df["Close"].values[valid_mask],
+            "Actual": df[target_col].values[valid_mask],
+            "Predicted": oof[valid_mask],
+        }).tail(10)
+        if task == "regression":
+            preview_df["Actual"] = preview_df["Actual"].map(lambda x: f"{x:+.6f}")
+            preview_df["Predicted"] = preview_df["Predicted"].map(lambda x: f"{x:+.6f}")
+        else:
+            preview_df["Actual"] = preview_df["Actual"].astype(int)
+            preview_df["Predicted"] = preview_df["Predicted"].astype(int)
+        preview_df["Date"] = preview_df["Date"].dt.strftime("%Y-%m-%d")
+        preview_df["Close"] = preview_df["Close"].map(lambda x: f"₹{x:.2f}")
+        st.dataframe(preview_df, use_container_width=True, hide_index=True)
+
+    # ── Tab 2: Feature Analysis ───────────────────────────────────────────
+    with tab_feat:
+        if st.session_state.fi_df is not None:
+            fi_df = st.session_state.fi_df
+            fi_sub1, fi_sub2 = st.tabs(["📊 Bar Chart", "🗺 Heatmap"])
+            with fi_sub1:
+                top_n = st.slider("Top N features", 10, min(40, len(fi_df)), 20, key="top_n_bar")
                 st.plotly_chart(
-                    plot_confusion_matrix(last_cm),
-                    width='stretch',
+                    plot_feature_importance(fi_df, top_n=top_n),
+                    use_container_width=True,
                     config={"displayModeBar": False},
                 )
+            with fi_sub2:
+                top_n_heat = st.slider("Top N features", 10, min(40, len(fi_df)), 25, key="top_n_heat")
+                st.plotly_chart(
+                    plot_feature_heatmap(fi_df, top_n=top_n_heat),
+                    use_container_width=True,
+                    config={"displayModeBar": False},
+                )
+        else:
+            st.info("Feature importance is not available for this model type.")
 
+    # ── Tab 3: Backtest ───────────────────────────────────────────────────
+    with tab_bt:
+        if st.session_state.backtest:
+            bt = st.session_state.backtest
 
-# ─── Section 3: Feature Importance ───────────────────────────────────────────
-if st.session_state.trained and st.session_state.fi_df is not None:
-    fi_df = st.session_state.fi_df
-    st.markdown('<div class="section-header">Feature Analysis</div>', unsafe_allow_html=True)
+            st.plotly_chart(
+                plot_equity_curves(bt),
+                use_container_width=True,
+                config={"displayModeBar": False},
+            )
 
-    fi_tab1, fi_tab2 = st.tabs(["📊 Bar Chart", "🗺 Heatmap"])
-    with fi_tab1:
-        top_n = st.slider("Top N features", 10, min(40, len(fi_df)), 20, key="top_n_bar")
-        st.plotly_chart(
-            plot_feature_importance(fi_df, top_n=top_n),
-            width='stretch',
-            config={"displayModeBar": False},
-        )
-    with fi_tab2:
-        top_n_heat = st.slider("Top N features", 10, min(40, len(fi_df)), 25, key="top_n_heat")
-        st.plotly_chart(
-            plot_feature_heatmap(fi_df, top_n=top_n_heat),
-            width='stretch',
-            config={"displayModeBar": False},
-        )
+            # ── Compact comparison table ──────────────────────────────────
+            strat_m = bt["metrics"]["Strategy"]
+            bah_m = bt["metrics"]["Buy & Hold"]
+            comparison_data = {
+                "Metric": ["Cumulative Return", "Annualised Return", "Sharpe Ratio", "Max Drawdown", "Win Rate"],
+                "ML Strategy": [
+                    format_pct(strat_m["Cumulative Return"]),
+                    format_pct(strat_m["Annualised Return"]),
+                    format_num(strat_m["Sharpe Ratio"], 3),
+                    format_pct(strat_m["Max Drawdown"]),
+                    format_pct(strat_m["Win Rate"]),
+                ],
+                "Buy & Hold": [
+                    format_pct(bah_m["Cumulative Return"]),
+                    format_pct(bah_m["Annualised Return"]),
+                    format_num(bah_m["Sharpe Ratio"], 3),
+                    format_pct(bah_m["Max Drawdown"]),
+                    format_pct(bah_m["Win Rate"]),
+                ],
+            }
+            st.dataframe(
+                pd.DataFrame(comparison_data),
+                use_container_width=True,
+                hide_index=True,
+            )
 
+            sig_info = bt["metrics"]["Signal Info"]
+            st.caption(
+                f"📌 Long days: {sig_info['Total Trades (Long Days)']} | "
+                f"% time in market: {sig_info['% Days in Market']:.1f}%"
+            )
 
-# ─── Section 4: Backtest ──────────────────────────────────────────────────────
-if st.session_state.trained and st.session_state.backtest:
-    bt = st.session_state.backtest
-    st.markdown('<div class="section-header">Backtest Performance</div>', unsafe_allow_html=True)
+            # ── Walk-forward overlay ──────────────────────────────────────
+            if st.session_state.wf_preds is not None:
+                try:
+                    wf_bt = run_backtest(df, st.session_state.wf_preds, task=task)
+                    import plotly.graph_objects as go
+                    fig_wf = plot_equity_curves(bt)
+                    fig_wf.add_trace(go.Scatter(
+                        x=wf_bt["strategy_cum"].index,
+                        y=(wf_bt["strategy_cum"] - 1) * 100,
+                        name="Walk-Forward Strategy",
+                        line=dict(color="#7B68EE", width=2, dash="longdash"),
+                    ))
+                    fig_wf.update_layout(title="Equity Curves — Standard vs Walk-Forward")
+                    st.plotly_chart(fig_wf, use_container_width=True, config={"displayModeBar": False})
+                except Exception as e:
+                    st.warning(f"Walk-forward backtest could not be rendered: {e}")
+        else:
+            st.info("Train a model to see backtest results.")
 
-    # ── Equity curve ─────────────────────────────────────────────────────
-    st.plotly_chart(
-        plot_equity_curves(bt),
-        width='stretch',
-        config={"displayModeBar": False},
-    )
-
-    # ── Performance metrics table ─────────────────────────────────────────
-    bt_cols = st.columns(2)
-    with bt_cols[0]:
-        st.markdown(
-            '<div style="color:#00C48C;font-size:0.78em;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">ML Strategy</div>',
-            unsafe_allow_html=True,
-        )
-        strat_m = bt["metrics"]["Strategy"]
-        metric_card("Cumulative Return", format_pct(strat_m["Cumulative Return"]))
-        metric_card("Annualised Return", format_pct(strat_m["Annualised Return"]))
-        metric_card("Sharpe Ratio", format_num(strat_m["Sharpe Ratio"], 3))
-        metric_card("Max Drawdown", format_pct(strat_m["Max Drawdown"]), color=COLORS["danger"])
-        metric_card("Win Rate", format_pct(strat_m["Win Rate"]))
-
-    with bt_cols[1]:
-        st.markdown(
-            '<div style="color:#FF8C42;font-size:0.78em;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Buy & Hold</div>',
-            unsafe_allow_html=True,
-        )
-        bah_m = bt["metrics"]["Buy & Hold"]
-        metric_card("Cumulative Return", format_pct(bah_m["Cumulative Return"]))
-        metric_card("Annualised Return", format_pct(bah_m["Annualised Return"]))
-        metric_card("Sharpe Ratio", format_num(bah_m["Sharpe Ratio"], 3))
-        metric_card("Max Drawdown", format_pct(bah_m["Max Drawdown"]), color=COLORS["danger"])
-        metric_card("Win Rate", format_pct(bah_m["Win Rate"]))
-
-    sig_info = bt["metrics"]["Signal Info"]
-    st.caption(
-        f"📌 Long days: {sig_info['Total Trades (Long Days)']} | "
-        f"% time in market: {sig_info['% Days in Market']:.1f}%"
-    )
-
-    # ── Walk-forward overlay ──────────────────────────────────────────────
-    if st.session_state.wf_preds is not None:
-        try:
-            wf_bt = run_backtest(df, st.session_state.wf_preds, task=task)
-            import plotly.graph_objects as go
-            fig_wf = plot_equity_curves(bt)
-            fig_wf.add_trace(go.Scatter(
-                x=wf_bt["strategy_cum"].index,
-                y=(wf_bt["strategy_cum"] - 1) * 100,
-                name="Walk-Forward Strategy",
-                line=dict(color="#7B68EE", width=2, dash="longdash"),
-            ))
-            fig_wf.update_layout(title="Equity Curves — Standard vs Walk-Forward")
-            st.markdown('<div class="section-header">Walk-Forward vs Standard Backtest</div>', unsafe_allow_html=True)
-            st.plotly_chart(fig_wf, width='stretch', config={"displayModeBar": False})
-        except Exception as e:
-            st.warning(f"Walk-forward backtest could not be rendered: {e}")
-
-    # ── Download predictions ──────────────────────────────────────────────
-    st.markdown('<div class="section-header">Export</div>', unsafe_allow_html=True)
-    csv_bytes = predictions_to_csv(df, result["oof_preds"], task)
-    dl_col, _ = st.columns([1, 3])
-    with dl_col:
+    # ── Tab 4: Export ─────────────────────────────────────────────────────
+    with tab_export:
+        csv_bytes = predictions_to_csv(df, result["oof_preds"], task)
         st.download_button(
             label="⬇️  Download Predictions CSV",
             data=csv_bytes,
             file_name=f"{etf_label.split()[0].lower()}_{task}_predictions.csv",
             mime="text/csv",
-            width='stretch',
+            use_container_width=True,
         )
 
 

@@ -94,6 +94,13 @@ def train_with_timeseries_split(
     base_model = clone(models_dict[model_name])
     pipeline = build_pipeline(model_name, base_model, task)
 
+    # ── Guard: replace any stray ±inf with NaN, then drop those rows ──────
+    inf_mask = ~np.isfinite(X).all(axis=1)
+    if inf_mask.any():
+        logger.warning(f"Dropping {inf_mask.sum()} rows with ±inf in features before training.")
+        X = X[~inf_mask]
+        y = y[~inf_mask]
+
     tscv = TimeSeriesSplit(n_splits=n_splits)
     fold_metrics = []
     oof_preds = np.full(len(y), np.nan)
